@@ -25,9 +25,34 @@ const stagger = (delay = 0, children = 0.1) => ({
   visible: { transition: { staggerChildren: children, delayChildren: delay } },
 });
 
+type SubscribeStatus = 'idle' | 'loading' | 'success' | 'duplicate' | 'error';
+
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [books, setBooks] = useState<any>(null);
+  const [email, setEmail] = useState('');
+  const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>('idle');
+
+  async function handleSubscribe() {
+    setSubscribeStatus('loading');
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setSubscribeStatus('success');
+        setEmail('');
+      } else if (res.status === 409) {
+        setSubscribeStatus('duplicate');
+      } else {
+        setSubscribeStatus('error');
+      }
+    } catch {
+      setSubscribeStatus('error');
+    }
+  }
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -246,12 +271,26 @@ export default function Home() {
                 <input
                   type="email"
                   placeholder="Enter your email address"
-                  className="flex-1 min-w-0 border border-input rounded-[6px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-[#8b7099] bg-background transition-colors"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSubscribe()}
+                  disabled={subscribeStatus === 'loading' || subscribeStatus === 'success'}
+                  className="flex-1 min-w-0 border border-input rounded-[6px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-[#8b7099] bg-background transition-colors disabled:opacity-50"
                 />
-                <AppButton variant="primary" size="md">Subscribe</AppButton>
+                <AppButton
+                  variant="primary"
+                  size="md"
+                  onClick={handleSubscribe}
+                  disabled={subscribeStatus === 'loading' || subscribeStatus === 'success'}
+                >
+                  {subscribeStatus === 'loading' ? 'Sending…' : 'Subscribe'}
+                </AppButton>
               </div>
               <p className="text-xs text-muted-foreground">
-                No spam. Unsubscribe anytime. Updates only when something ships.
+                {subscribeStatus === 'success' && 'You\'re in! We\'ll let you know when something ships.'}
+                {subscribeStatus === 'duplicate' && 'This email is already subscribed.'}
+                {subscribeStatus === 'error' && 'Something went wrong, please try again.'}
+                {(subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'No spam. Unsubscribe anytime. Updates only when something ships.'}
               </p>
             </div>
           </section>
