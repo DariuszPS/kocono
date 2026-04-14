@@ -10,6 +10,7 @@ interface AppButtonProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   onClick?: () => void;
+  disabled?: boolean;
   className?: string;
   target?: string;
   rel?: string;
@@ -36,6 +37,7 @@ export function AppButton({
   icon,
   children,
   onClick,
+  disabled,
   className,
   target,
   rel,
@@ -45,6 +47,7 @@ export function AppButton({
     'inline-flex items-center justify-center font-medium whitespace-nowrap transition-colors',
     sizeClasses[size],
     variantClasses[variant],
+    disabled && 'opacity-50 cursor-not-allowed',
     className
   );
 
@@ -58,7 +61,7 @@ export function AppButton({
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={onClick} disabled={disabled} className={classes}>
       {icon && <span className="shrink-0 flex items-center">{icon}</span>}
       {children}
     </button>
