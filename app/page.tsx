@@ -9,6 +9,7 @@ import { AppButton } from '@/components/AppButton';
 import { GithubIcon } from '@/components/icons/GithubIcon';
 import { ColorfulHighlight } from '@/components/ColorfulHighlight';
 import { HighlightWord } from '@/components/HighlightWord';
+import { cn } from '@/lib/utils';
 import { AnimatedBorderBox } from '@/components/AnimatedBorderBox';
 import { Moon, Sun } from 'lucide-react';
 
@@ -25,7 +26,9 @@ const stagger = (delay = 0, children = 0.1) => ({
   visible: { transition: { staggerChildren: children, delayChildren: delay } },
 });
 
-type SubscribeStatus = 'idle' | 'loading' | 'success' | 'duplicate' | 'error';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+type SubscribeStatus = 'idle' | 'loading' | 'success' | 'duplicate' | 'invalid' | 'error';
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
@@ -34,6 +37,10 @@ export default function Home() {
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>('idle');
 
   async function handleSubscribe() {
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setSubscribeStatus('invalid');
+      return;
+    }
     setSubscribeStatus('loading');
     try {
       const res = await fetch('/api/subscribe', {
@@ -286,9 +293,17 @@ export default function Home() {
                   {subscribeStatus === 'loading' ? 'Sending…' : 'Subscribe'}
                 </AppButton>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className={cn(
+                'text-xs',
+                subscribeStatus === 'success' && 'text-green-600 dark:text-green-400',
+                subscribeStatus === 'error' && 'text-red-600 dark:text-red-400',
+                subscribeStatus === 'invalid' && 'text-red-600 dark:text-red-400',
+                subscribeStatus === 'duplicate' && 'text-amber-600 dark:text-amber-400',
+                (subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'text-muted-foreground',
+              )}>
                 {subscribeStatus === 'success' && 'You\'re in! We\'ll let you know when something ships.'}
-                {subscribeStatus === 'duplicate' && 'This email is already subscribed.'}
+                {subscribeStatus === 'duplicate' && 'This email is already on the list.'}
+                {subscribeStatus === 'invalid' && 'Please enter a valid email address.'}
                 {subscribeStatus === 'error' && 'Something went wrong, please try again.'}
                 {(subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'No spam. Unsubscribe anytime. Updates only when something ships.'}
               </p>
@@ -311,6 +326,9 @@ export default function Home() {
             </a>
           </p>
           <p className="text-xs text-muted-foreground">© 2026 Kocono</p>
+          <p className="text-xs text-muted-foreground">
+            <a href="/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>
+          </p>
         </footer>
 
       </div>
