@@ -34,8 +34,20 @@ const sourceSans = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kocono.com"),
   title: "Kocono - Kobo Highlights to Apple Notes",
-  description: "Preserve your Kobo Colour highlights when exporting to Apple Notes",
+  description: "Export color-coded highlights from your Kobo e-reader to Apple Notes. Preserves your highlight colors.",
+  openGraph: {
+    title: "Kocono - Kobo Highlights to Apple Notes",
+    description: "Export color-coded highlights from your Kobo e-reader to Apple Notes. Preserves your highlight colors.",
+    images: ["/opengraph-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kocono - Kobo Highlights to Apple Notes",
+    description: "Export color-coded highlights from your Kobo e-reader to Apple Notes. Preserves your highlight colors.",
+    images: ["/opengraph-image.png"],
+  },
 };
 
 export default function RootLayout({
