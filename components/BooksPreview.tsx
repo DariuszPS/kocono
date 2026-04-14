@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AppButton } from '@/components/AppButton';
 import { Download, RotateCcw } from 'lucide-react';
 
 const COLOR_MAP: Record<number, { emoji: string; name: string; color: string; bgColor: string; appleColor: string }> = {
@@ -172,14 +172,12 @@ export function BooksPreview({ books, onReset }: BooksPreviewProps) {
       </CardContent>
 
       <CardFooter className="flex gap-3">
-        <Button onClick={handleDownload} className="flex-1">
-          <Download className="w-4 h-4 mr-2" />
+        <AppButton onClick={handleDownload} className="flex-1" icon={<Download className="w-4 h-4" />}>
           Download AppleScript
-        </Button>
-        <Button onClick={onReset} variant="outline">
-          <RotateCcw className="w-4 h-4 mr-2" />
+        </AppButton>
+        <AppButton onClick={onReset} variant="outline" icon={<RotateCcw className="w-4 h-4" />}>
           Start over
-        </Button>
+        </AppButton>
       </CardFooter>
     </Card>
   );

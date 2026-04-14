@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
@@ -30,21 +31,35 @@ const faqs = [
 ];
 
 export function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
-    <div className="mt-12">
-      <h2 className="text-2xl font-medium mb-6">Frequently asked questions</h2>
-      <div className="grid gap-4">
-        {faqs.map((faq, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <CardTitle className="text-base">{faq.question}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">{faq.answer}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+    <div className="flex flex-col divide-y divide-border border border-border rounded-xl overflow-hidden">
+      {faqs.map((faq, index) => {
+        const isOpen = openIndex === index;
+        return (
+          <div key={index}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : index)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left bg-card hover:bg-accent transition-colors"
+            >
+              <span className="text-sm font-medium text-foreground pr-4">{faq.question}</span>
+              <ChevronDown
+                className={`w-4 h-4 flex-shrink-0 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            <div
+              className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+            >
+              <div className="overflow-hidden">
+                <p className="px-5 pb-4 pt-3 text-sm text-muted-foreground leading-relaxed bg-card">
+                  {faq.answer}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

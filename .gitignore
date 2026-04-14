@@ -16,3 +16,7 @@ yarn-error.log*
 
 # misc
 .DS_Store
+.vercel
+
+# design assets (not needed in repo)
+assets/
