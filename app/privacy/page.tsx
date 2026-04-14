@@ -69,8 +69,8 @@ export default function PrivacyPage() {
           </ul>
           <p>
             To exercise these rights, email us at{' '}
-            <a href="mailto:hello@designariusz.com" className="underline">
-              hello@designariusz.com
+            <a href="mailto:contact@designariusz.com" className="underline">
+              contact@designariusz.com
             </a>
             .
           </p>
