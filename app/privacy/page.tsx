@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <section className="mt-8 space-y-4 text-sm leading-relaxed">
           <h2 className="text-lg font-semibold">1. Who we are</h2>
           <p>
-            Kocono (<a href="https://kocono.app" className="underline">kocono.app</a>) is a tool for
+            Kocono (<a href="https://kocono.com" className="underline">kocono.com</a>) is a tool for
             exporting Kobo highlights, created by{' '}
             <a href="https://designariusz.com" className="underline">Designariusz</a>.
           </p>

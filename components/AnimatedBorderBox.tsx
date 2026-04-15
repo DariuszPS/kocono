@@ -25,7 +25,7 @@ export function AnimatedBorderBox({
   delay = 0.1,
 }: AnimatedBorderBoxProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.2 });
+  const isInView = useInView(containerRef, { once: false, amount: 0.2 });
   const [dims, setDims] = useState({ w: 0, h: 0 });
   const [resolvedColor, setResolvedColor] = useState(color ?? '#8b7099');
 

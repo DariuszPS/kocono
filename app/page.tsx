@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence, useAnimate } from 'motion/react';
 import { KoconoUploader } from '@/components/KoconoUploader';
 import { BooksPreview } from '@/components/BooksPreview';
 import { FAQ } from '@/components/FAQ';
@@ -35,6 +35,8 @@ export default function Home() {
   const [books, setBooks] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState<SubscribeStatus>('idle');
+  const [boxKey, setBoxKey] = useState(0);
+  const [newsletterScope, animateNewsletter] = useAnimate();
 
   async function handleSubscribe() {
     if (!EMAIL_REGEX.test(email.trim())) {
@@ -51,6 +53,7 @@ export default function Home() {
       if (res.ok) {
         setSubscribeStatus('success');
         setEmail('');
+        setBoxKey(k => k + 1);
       } else if (res.status === 409) {
         setSubscribeStatus('duplicate');
       } else {
@@ -65,6 +68,12 @@ export default function Home() {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
+  useEffect(() => {
+    if (subscribeStatus === 'invalid') {
+      animateNewsletter(newsletterScope.current, { x: [0, -10, 10, -8, 8, -4, 4, 0] }, { duration: 0.45, ease: 'easeInOut' });
+    }
+  }, [subscribeStatus]);
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       <div className="max-w-[1360px] mx-auto px-4">
@@ -76,14 +85,27 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <img src="/logo.svg" alt="Kocono" className="h-[25px] w-auto dark:invert" />
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="flex items-center gap-1.5 bg-card border border-border rounded-[6px] px-3 py-1.5 text-[13px] font-medium text-foreground hover:bg-accent transition-colors"
-          >
-            {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-            {darkMode ? 'Light' : 'Dark'}
-          </button>
+          <a href="/"><img src="/logo.svg" alt="Kocono" className="h-[25px] w-auto dark:invert" /></a>
+          <div className="flex items-center gap-3 ml-auto">
+            <AppButton
+              size="md"
+              variant="outline"
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={<GithubIcon />}
+            >
+              Star on GitHub
+            </AppButton>
+            <AppButton
+              size="md"
+              variant="outline"
+              onClick={() => setDarkMode(!darkMode)}
+              icon={darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            >
+              {darkMode ? 'Light' : 'Dark'}
+            </AppButton>
+          </div>
         </motion.header>
 
         {/* ── Hero ────────────────────────────────────────────── */}
@@ -110,28 +132,37 @@ export default function Home() {
 
             <motion.div
               variants={fadeUp}
-              className="flex flex-col gap-2 mt-1 w-full md:flex-row md:w-auto"
+              className="flex flex-col gap-3 mt-1 w-full md:w-auto"
             >
-              <AppButton
-                size="md"
-                variant="primary"
-                className="w-full md:w-auto"
-                onClick={() => document.getElementById('upload')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Get started →
-              </AppButton>
-              <AppButton
-                size="md"
-                variant="outline"
-                className="w-full md:w-auto"
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                icon={<GithubIcon />}
-              >
-                Star on GitHub
-              </AppButton>
+              <div className="flex flex-col gap-2 w-full md:flex-row md:w-auto">
+                <AppButton
+                  size="md"
+                  variant="primary"
+                  className="w-full md:w-auto"
+                  onClick={() => document.getElementById('upload')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Get started →
+                </AppButton>
+                <a
+                  href="https://www.producthunt.com/products/kocono?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-kocono"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0"
+                >
+                  <img
+                    alt="Kocono - Preserve Kobo Colour highlights in Apple Notes | Product Hunt"
+                    width="200"
+                    height="43"
+                    src={
+                      darkMode
+                        ? 'https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1124316&theme=dark&t=1776251469515'
+                        : 'https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1124316&theme=light&t=1776251725490'
+                    }
+                  />
+                </a>
+              </div>
             </motion.div>
+
           </motion.div>
 
           {/* Hero image */}
@@ -206,6 +237,24 @@ export default function Home() {
             that system shouldn&apos;t disappear when you export.{' '}
             <strong className="font-semibold">Kocono</strong> preserves it.
           </motion.p>
+          <motion.div variants={fadeUp} className="mt-6">
+            <a
+              href="https://www.producthunt.com/products/kocono?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-kocono"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                alt="Kocono - Preserve Kobo Colour highlights in Apple Notes | Product Hunt"
+                width="200"
+                height="43"
+                src={
+                  darkMode
+                    ? 'https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1124316&theme=dark&t=1776251469515'
+                    : 'https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1124316&theme=light&t=1776251725490'
+                }
+              />
+            </a>
+          </motion.div>
         </motion.section>
 
         {/* ── FAQ ─────────────────────────────────────────────── */}
@@ -258,58 +307,114 @@ export default function Home() {
 
         {/* ── Newsletter ──────────────────────────────────────── */}
         <motion.div
+          ref={newsletterScope}
           className="flex justify-center mb-16"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeUp}
         >
-          <AnimatedBorderBox className="w-full max-w-[924px] rounded-2xl">
-        <section className="flex flex-col items-center gap-6 px-8 py-8 md:flex-row md:justify-center md:gap-10 md:px-10">
-            <img src="/contact.png" alt="" className="w-[220px] h-auto object-contain flex-shrink-0 md:w-[280px]" />
-            <div className="flex flex-col gap-3 w-full md:max-w-[460px]">
-              <h2 className="font-playfair font-medium text-[32px] text-foreground">
-                Let&apos;s stay in touch!
-              </h2>
-              <p className="text-base text-foreground">
-                Get notified when new features launch (mobile support, new export formats)
-              </p>
-              <div className="flex gap-2 mt-1">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSubscribe()}
-                  disabled={subscribeStatus === 'loading' || subscribeStatus === 'success'}
-                  className="flex-1 min-w-0 border border-input rounded-[6px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-[#8b7099] bg-background transition-colors disabled:opacity-50"
-                />
-                <AppButton
-                  variant="primary"
-                  size="md"
-                  onClick={handleSubscribe}
-                  disabled={subscribeStatus === 'loading' || subscribeStatus === 'success'}
-                >
-                  {subscribeStatus === 'loading' ? 'Sending…' : 'Subscribe'}
-                </AppButton>
+          <AnimatedBorderBox
+            key={boxKey}
+            color={subscribeStatus === 'success' ? '#A1C698' : undefined}
+            className="w-full max-w-[924px] rounded-2xl overflow-hidden"
+          >
+            <section className="relative flex flex-col items-center gap-6 px-8 py-8 md:flex-row md:justify-center md:gap-10 md:px-10 min-h-[180px]">
+              <AnimatePresence mode="wait">
+                {subscribeStatus === 'success' ? (
+                  <motion.img
+                    key="success-img"
+                    src="/newsletter-success.png"
+                    alt=""
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                    className="w-[220px] h-auto object-contain flex-shrink-0 md:w-[280px]"
+                  />
+                ) : (
+                  <motion.img
+                    key="contact-img"
+                    src="/contact.png"
+                    alt=""
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                    className="w-[220px] h-auto object-contain flex-shrink-0 md:w-[280px]"
+                  />
+                )}
+              </AnimatePresence>
+              <div className="flex flex-col gap-3 w-full md:max-w-[460px] relative">
+                <AnimatePresence mode="wait">
+                  {subscribeStatus === 'success' ? (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                      className="flex flex-col gap-3"
+                    >
+                      <h2 className="font-playfair font-medium text-[32px] text-foreground">
+                        You&apos;re in! 🎉
+                      </h2>
+                      <p className="text-base text-foreground">
+                        We&apos;ll let you know when something ships. No spam, promise.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="form"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                      className="flex flex-col gap-3"
+                    >
+                      <h2 className="font-playfair font-medium text-[32px] text-foreground">
+                        Let&apos;s stay in touch!
+                      </h2>
+                      <p className="text-base text-foreground">
+                        Get notified when new features launch (mobile support, new export formats)
+                      </p>
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && handleSubscribe()}
+                          disabled={subscribeStatus === 'loading'}
+                          className="flex-1 min-w-0 border border-input rounded-[6px] px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-[#8b7099] bg-background transition-colors disabled:opacity-50"
+                        />
+                        <AppButton
+                          variant="primary"
+                          size="md"
+                          onClick={handleSubscribe}
+                          disabled={subscribeStatus === 'loading'}
+                        >
+                          {subscribeStatus === 'loading' ? 'Sending…' : 'Subscribe'}
+                        </AppButton>
+                      </div>
+                      <p className={cn(
+                        'text-xs',
+                        subscribeStatus === 'error' && 'text-red-600 dark:text-red-400',
+                        subscribeStatus === 'invalid' && 'text-red-600 dark:text-red-400',
+                        subscribeStatus === 'duplicate' && 'text-amber-600 dark:text-amber-400',
+                        (subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'text-muted-foreground',
+                      )}>
+                        {subscribeStatus === 'duplicate' && 'This email is already on the list.'}
+                        {subscribeStatus === 'invalid' && 'Please enter a valid email address.'}
+                        {subscribeStatus === 'error' && 'Something went wrong, please try again.'}
+                        {(subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'No spam. Unsubscribe anytime. Updates only when something ships.'}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <p className={cn(
-                'text-xs',
-                subscribeStatus === 'success' && 'text-green-600 dark:text-green-400',
-                subscribeStatus === 'error' && 'text-red-600 dark:text-red-400',
-                subscribeStatus === 'invalid' && 'text-red-600 dark:text-red-400',
-                subscribeStatus === 'duplicate' && 'text-amber-600 dark:text-amber-400',
-                (subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'text-muted-foreground',
-              )}>
-                {subscribeStatus === 'success' && 'You\'re in! We\'ll let you know when something ships.'}
-                {subscribeStatus === 'duplicate' && 'This email is already on the list.'}
-                {subscribeStatus === 'invalid' && 'Please enter a valid email address.'}
-                {subscribeStatus === 'error' && 'Something went wrong, please try again.'}
-                {(subscribeStatus === 'idle' || subscribeStatus === 'loading') && 'No spam. Unsubscribe anytime. Updates only when something ships.'}
-              </p>
-            </div>
-          </section>
-        </AnimatedBorderBox>
+            </section>
+          </AnimatedBorderBox>
         </motion.div>
 
         {/* ── Divider ─────────────────────────────────────────── */}
